@@ -1,0 +1,704 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Zero Paper Project</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@400;600;700&display=swap">
+<style>
+/* Layout: a single reading column (max 1120px) that moves from thesis (paper stacks) to evidence (charts) to raw data; sticky section nav on top. */
+:root{
+  --bg:#f2f5f2; --surface:#fbfcfa; --fg:#14201b; --fg2:#4a5852; --muted:#76847e;
+  --line:#dbe2dd; --grid:#e3e9e4; --axis:#bfc9c3;
+  --accent:#0c7550; --accent-ink:#ffffff;
+  --bw:#2a78d6; --color:#eb6834;
+  --good:#006300; --bad:#b83232;
+  --paper:#ffffff; --paper-edge:#b9c4be;
+  --tip-bg:#14201b; --tip-fg:#f2f5f2;
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1311; --surface:#141c19; --fg:#e6ede9; --fg2:#b2c0b9; --muted:#83918b;
+    --line:#25302c; --grid:#202a26; --axis:#35413c;
+    --accent:#3dba87; --accent-ink:#06120d;
+    --bw:#3987e5; --color:#d95926;
+    --good:#2fbf4f; --bad:#e66767;
+    --paper:#dbe3de; --paper-edge:#5f6c66;
+    --tip-bg:#e6ede9; --tip-fg:#0d1311;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1311; --surface:#141c19; --fg:#e6ede9; --fg2:#b2c0b9; --muted:#83918b;
+  --line:#25302c; --grid:#202a26; --axis:#35413c;
+  --accent:#3dba87; --accent-ink:#06120d;
+  --bw:#3987e5; --color:#d95926;
+  --good:#2fbf4f; --bad:#e66767;
+  --paper:#dbe3de; --paper-edge:#5f6c66;
+  --tip-bg:#e6ede9; --tip-fg:#0d1311;
+  color-scheme:dark;
+}
+:root:not([data-lang="en"]) .en{display:none}
+:root[data-lang="en"] .ar{display:none}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.65}
+*{box-sizing:border-box}
+.wrap{max-width:1120px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+bdi{unicode-bidi:isolate}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;padding-block:10px}
+.brand{font-family:var(--f-display);font-weight:600;font-size:15px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.brand i{display:inline-block;width:14px;height:18px;border:1.5px solid var(--accent);border-radius:2px;position:relative}
+.brand i::after{content:"";position:absolute;inset:auto 2px 3px 2px;height:1.5px;background:var(--accent)}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{color:var(--fg2);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px;white-space:nowrap}
+nav a:hover{background:var(--surface);color:var(--fg)}
+.lang{font:inherit;font-size:14px;font-weight:600;color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:999px;padding:5px 14px;cursor:pointer;white-space:nowrap}
+.lang:hover{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* hero */
+.hero{padding-block:48px 24px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:end}
+.eyebrow{font-size:13px;letter-spacing:.06em;color:var(--accent);font-weight:600;margin-bottom:14px}
+.hero h1{font-size:clamp(32px,5vw,54px);font-weight:700;letter-spacing:-.01em}
+.hero h1 .num{font-family:var(--f-display);color:var(--accent)}
+.lede{margin-top:18px;color:var(--fg2);font-size:17px;max-width:58ch}
+.stacks figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+@media (max-width:820px){.hero{grid-template-columns:1fr;gap:24px;padding-block:32px 16px}}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-block:24px 8px}
+.kpi{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kpi .k{font-size:13px;color:var(--fg2)}
+.kpi .v{font-family:var(--f-display);font-size:32px;font-weight:600;line-height:1.1}
+.kpi .s{font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:13px;font-weight:500;padding:1px 8px;border-radius:999px;width:fit-content}
+.chip.down{color:var(--good);background:color-mix(in oklab,var(--good) 12%,transparent)}
+.chip.up{color:var(--bad);background:color-mix(in oklab,var(--bad) 12%,transparent)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.kpis{grid-template-columns:1fr}}
+
+/* sections */
+section{padding-block:44px 8px;scroll-margin-top:64px}
+.sh{display:grid;gap:8px;margin-bottom:20px;max-width:68ch}
+.sh h2{font-size:clamp(22px,3vw,30px);font-weight:600}
+.sh p{color:var(--fg2)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 18px 12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--fg2);margin-bottom:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+.sw.box{height:10px;width:10px;border-radius:2px}
+.sw.dash{background:repeating-linear-gradient(90deg,var(--fg2) 0 4px,transparent 4px 7px)}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* phases */
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.phase{padding:20px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.phase .yr{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.phase h3{font-size:20px;font-weight:600}
+.phase p{color:var(--fg2);font-size:15px}
+.phase .big{font-family:var(--f-display);font-size:28px;font-weight:600;color:var(--accent)}
+.meter{height:6px;border-radius:3px;background:var(--grid);overflow:hidden}
+.meter b{display:block;height:100%;background:var(--accent);border-radius:3px}
+@media (max-width:820px){.phases{grid-template-columns:1fr}}
+
+/* charts */
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.chart .yl text{text-anchor:end}
+.chart .grid line{stroke:var(--grid);stroke-width:1}
+.chart .base{stroke:var(--axis);stroke-width:1}
+.chart .ysep{stroke:var(--axis);stroke-width:1;stroke-dasharray:2 3}
+.chart .yearlab{font-family:var(--f-display);font-size:13px;font-weight:600;fill:var(--fg2)}
+.chart .tot{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
+.chart .area{fill:var(--accent);opacity:.09}
+.chart .avg{fill:none;stroke:var(--fg2);stroke-width:1.5;stroke-dasharray:5 4}
+.chart .dot{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+.chart .ann{font-family:var(--f-display);font-size:12px;font-weight:600;fill:var(--fg)}
+.chart .guide{stroke:var(--fg2);stroke-width:1}
+.chart .bwb{fill:var(--bw)} .chart .cob{fill:var(--color)}
+.chart .hit{fill:transparent;cursor:crosshair}
+.chart .hl{fill:var(--fg);opacity:.06}
+.chart .ref{stroke:var(--fg2);stroke-width:1;stroke-dasharray:3 3}
+.chart .shareline{fill:none;stroke:var(--color);stroke-width:2}
+.tip{position:absolute;pointer-events:none;background:var(--tip-bg);color:var(--tip-fg);border-radius:8px;padding:9px 12px;font-size:13px;line-height:1.5;min-width:170px;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:5;font-family:var(--f-body)}
+.tip b{font-family:var(--f-display);font-weight:600;display:block;margin-bottom:2px}
+.tip .r{display:flex;justify-content:space-between;gap:14px}
+.tip .r span:last-child{font-family:var(--f-mono)}
+.tip .sw{margin-inline-end:6px}
+
+/* jan-jul bars */
+.ybars{display:grid;gap:14px}
+.yrow{display:grid;grid-template-columns:56px minmax(0,1fr) 150px;gap:14px;align-items:center}
+.yrow .y{font-family:var(--f-display);font-weight:600;font-size:17px}
+.track{display:flex;gap:2px;height:30px}
+.track div{height:100%;border-radius:3px;min-width:2px}
+.yrow .vals{display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.yrow .vals .num{font-size:15px;font-weight:500}
+@media (max-width:560px){.yrow{grid-template-columns:44px minmax(0,1fr);}.yrow .vals{grid-column:2;flex-direction:row;gap:10px;align-items:center}}
+.cols2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+@media (max-width:880px){.cols2{grid-template-columns:1fr}}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-weight:600;color:var(--fg2);font-size:13px;text-align:start;padding:10px 12px;border-bottom:1px solid var(--axis);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.n,th.n{text-align:end;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.delta.down{color:var(--good)} .delta.up{color:var(--bad)} .delta.na{color:var(--muted)}
+tr.ysep td{border-top:1px solid var(--axis)}
+
+/* heatmap */
+.heat{display:grid;grid-template-columns:64px repeat(12,minmax(48px,1fr)) 72px;gap:3px;min-width:760px;font-family:var(--f-mono);font-size:12px}
+.heat .h{color:var(--muted);text-align:center;padding:4px 0;font-family:var(--f-body)}
+.heat .yl{font-family:var(--f-display);font-weight:600;font-size:14px;display:flex;align-items:center;color:var(--fg)}
+.heat .c{border-radius:4px;padding:12px 2px;text-align:center;font-variant-numeric:tabular-nums;cursor:default}
+.heat .c.empty{background:repeating-linear-gradient(135deg,var(--grid) 0 4px,transparent 4px 8px);color:var(--muted)}
+.heat .avgc{display:flex;align-items:center;justify-content:center;font-weight:500;color:var(--fg);border-inline-start:1px solid var(--axis)}
+.scale{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:12px;font-family:var(--f-mono)}
+.scale .bar2{height:8px;width:160px;border-radius:4px;background:linear-gradient(90deg,color-mix(in oklab,var(--accent) 6%,var(--surface)),var(--accent))}
+:root[data-lang="ar"] .scale .bar2, :root:not([data-lang="en"]) .scale .bar2{background:linear-gradient(270deg,color-mix(in oklab,var(--accent) 6%,var(--surface)),var(--accent))}
+
+/* highlights */
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.fact{padding:18px 20px;border-top:3px solid var(--accent);background:var(--surface);border-radius:0 0 10px 10px;display:flex;flex-direction:column;gap:6px}
+.fact .t{font-size:13px;color:var(--muted)}
+.fact .v{font-family:var(--f-display);font-size:24px;font-weight:600}
+.fact p{color:var(--fg2);font-size:15px}
+@media (max-width:820px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.facts{grid-template-columns:1fr}}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters button{font:inherit;font-size:14px;padding:5px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg2);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.notes{display:grid;gap:10px;color:var(--fg2);font-size:15px;max-width:76ch;padding-inline-start:20px;margin:0}
+/* impact */
+.itiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.itile{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.itile .k{font-size:13px;color:var(--fg2)}
+.itile .v{font-family:var(--f-display);font-size:26px;font-weight:600;line-height:1.15;overflow-wrap:anywhere}
+.itile .u{font-size:14px;font-weight:400;color:var(--muted);font-family:var(--f-body)}
+.itile .s{font-size:12px;color:var(--muted)}
+.itile.lead{background:color-mix(in oklab,var(--accent) 10%,var(--surface))}
+.itile.lead .v{color:var(--accent)}
+@media (max-width:980px){.itiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.itiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.runrate{margin-top:12px;padding:12px 16px;border-radius:10px;border:1px dashed var(--accent);color:var(--fg2);font-size:15px}
+.runrate b{color:var(--fg);font-family:var(--f-display);font-weight:600}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+@media (max-width:420px){.fgrid{grid-template-columns:1fr}}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--fg2);min-width:0}
+.fld input,.fld select{font:inherit;font-size:14px;font-family:var(--f-mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+.fld input.changed{border-color:var(--accent)}
+.reset{font:inherit;font-size:12.5px;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 0;text-decoration:underline}
+.chart .savb{fill:var(--accent);opacity:.22}
+.chart .savb.neg{fill:var(--bad);opacity:.35}
+.sources{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.sources summary{cursor:pointer;font-weight:600;font-size:15px}
+.sources .notes{margin-top:12px}
+footer{margin-top:48px;border-top:1px solid var(--line);padding-block:20px 40px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.track div,.meter b{transition:width .6s ease}}
+</style>
+
+<div id="app" dir="rtl">
+<header class="bar">
+  <div class="wrap">
+    <div class="brand"><i aria-hidden="true"></i><span class="ar">مشروع صفر ورق</span><span class="en">Zero Paper</span></div>
+    <nav aria-label="Sections">
+      <a href="#phases"><span class="ar">المراحل</span><span class="en">Phases</span></a>
+      <a href="#impact"><span class="ar">الأثر</span><span class="en">Impact</span></a>
+      <a href="#trend"><span class="ar">الاتجاه</span><span class="en">Trend</span></a>
+      <a href="#years"><span class="ar">السنوات</span><span class="en">Years</span></a>
+      <a href="#months"><span class="ar">الشهور</span><span class="en">Months</span></a>
+      <a href="#mix"><span class="ar">أبيض وأسود / ألوان</span><span class="en">B&amp;W / Color</span></a>
+      <a href="#facts"><span class="ar">أرقام لافتة</span><span class="en">Highlights</span></a>
+      <a href="#data"><span class="ar">البيانات</span><span class="en">Data</span></a>
+    </nav>
+    <button class="lang" id="langBtn" type="button"><span class="ar">English</span><span class="en">العربية</span></button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow"><span class="ar">مشروع صفر ورق · بيانات الطباعة من يناير 2023 حتى سبتمبر 2026</span><span class="en">Zero Paper Project · Printing data, January 2023 to September 2026</span></div>
+      <h1><span class="ar">من <bdi class="num">16,701</bdi> صفحة شهرياً إلى <bdi class="num">5,242</bdi></span><span class="en">From <span class="num">16,701</span> pages a month to <span class="num">5,242</span></span></h1>
+      <p class="lede"><span class="ar">يعرض هذا الموقع حجم الطباعة الشهري على مدى 45 شهراً. بعد عامين مستقرين عند نحو 200 ألف صفحة سنوياً، انخفضت الطباعة إلى النصف في 2025، واستمر الانخفاض في 2026 حتى صار متوسط الشهر أقل من ثلث مستواه في 2023.</span><span class="en">This site walks through monthly printing volume across 45 months. After two flat years at about 200,000 pages a year, printing halved in 2025 and kept falling in 2026, to less than a third of the 2023 monthly average.</span></p>
+    </div>
+    <figure class="stacks" style="margin:0">
+      <div class="chart" id="stacks" dir="ltr"></div>
+      <figcaption><span class="ar">متوسط الصفحات المطبوعة شهرياً في كل عام. ارتفاع كل رزمة ورق يتناسب مع الرقم.</span><span class="en">Average pages printed per month, by year. Each paper stack is drawn to scale.</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k"><span class="ar">متوسط الشهر في 2026</span><span class="en">Monthly average, 2026</span></div><div class="v num">5,242</div><span class="chip down">▼ <bdi>−68.6%</bdi></span><div class="s"><span class="ar">مقابل 16,701 في 2023</span><span class="en">vs 16,701 in 2023</span></div></div>
+    <div class="kpi"><div class="k"><span class="ar">يناير–سبتمبر 2026</span><span class="en">Jan–Sep 2026</span></div><div class="v num">47,174</div><span class="chip down">▼ <bdi>−67.0%</bdi></span><div class="s"><span class="ar">مقابل 142,809 في نفس الفترة من 2023</span><span class="en">vs 142,809 in the same period of 2023</span></div></div>
+    <div class="kpi"><div class="k"><span class="ar">إجمالي 2025</span><span class="en">Total, 2025</span></div><div class="v num">100,099</div><span class="chip down">▼ <bdi>−50.2%</bdi></span><div class="s"><span class="ar">مقابل 200,913 في 2024</span><span class="en">vs 200,913 in 2024</span></div></div>
+    <div class="kpi"><div class="k"><span class="ar">نسبة الطباعة الملونة، 2026</span><span class="en">Color share, 2026</span></div><div class="v num">44.4%</div><span class="chip down">▼ <bdi>−19.5</bdi><span class="ar">نقطة</span><span class="en">pts</span></span><div class="s"><span class="ar">مقابل 63.9% في 2023</span><span class="en">vs 63.9% in 2023</span></div></div>
+  </div>
+
+  <section id="phases">
+    <div class="sh">
+      <h2><span class="ar">ثلاث مراحل في البيانات</span><span class="en">Three phases in the data</span></h2>
+      <p><span class="ar">الشريط في كل بطاقة يوضح متوسط الطباعة الشهري في المرحلة مقارنة بخط الأساس.</span><span class="en">The bar on each card shows the phase's monthly average against the baseline.</span></p>
+    </div>
+    <div class="phases">
+      <div class="phase">
+        <div class="yr">2023 – 2024</div>
+        <h3><span class="ar">خط الأساس</span><span class="en">Baseline</span></h3>
+        <div class="big num">16,722<small style="font-size:14px;color:var(--muted);font-weight:400"> <span class="ar">/ شهر</span><span class="en">/ month</span></small></div>
+        <div class="meter"><b style="width:100%"></b></div>
+        <p><span class="ar">نحو 200 ألف صفحة كل عام (200,407 ثم 200,913). تذبذب كبير من شهر لآخر بين 8,027 و30,192 صفحة.</span><span class="en">About 200,000 pages each year (200,407, then 200,913), with wide month-to-month swings between 8,027 and 30,192 pages.</span></p>
+      </div>
+      <div class="phase">
+        <div class="yr">2025</div>
+        <h3><span class="ar">نقطة التحول</span><span class="en">Turning point</span></h3>
+        <div class="big num">8,342<small style="font-size:14px;color:var(--muted);font-weight:400"> <span class="ar">/ شهر</span><span class="en">/ month</span></small></div>
+        <div class="meter"><b style="width:49.9%"></b></div>
+        <p><span class="ar">انخفض الإجمالي إلى 100,099 صفحة (−50.2%). من مايو فصاعداً جاء كل شهر أقل من نفس الشهر في 2024، وكان النصف الثاني (44,604) أقل من الأول (55,495).</span><span class="en">The total fell to 100,099 pages (−50.2%). From May on, every month came in below the same month of 2024, and the second half (44,604) was lower than the first (55,495).</span></p>
+      </div>
+      <div class="phase">
+        <div class="yr"><span class="ar">2026 (يناير–سبتمبر)</span><span class="en">2026 (Jan–Sep)</span></div>
+        <h3><span class="ar">مستوى منخفض ومستقر</span><span class="en">Low and steady</span></h3>
+        <div class="big num">5,242<small style="font-size:14px;color:var(--muted);font-weight:400"> <span class="ar">/ شهر</span><span class="en">/ month</span></small></div>
+        <div class="meter"><b style="width:31.3%"></b></div>
+        <p><span class="ar">47,174 صفحة في تسعة أشهر، أي أقل بـ 37.2% من متوسط 2025. كل الأشهر بين 3,728 و6,213 صفحة، والتذبذب أصبح محدوداً.</span><span class="en">47,174 pages in nine months, 37.2% below the 2025 average. Every month sits between 3,728 and 6,213 pages, so the swings have narrowed.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="impact">
+    <div class="sh">
+      <h2><span class="ar">الأثر التقديري للمشروع</span><span class="en">Estimated impact</span></h2>
+      <p><span class="ar">الصفحات الموفّرة = الطباعة المتوقعة لو استمر متوسط خط الأساس، ناقص الطباعة الفعلية، محسوبة لكل شهر ولكل نوع (أبيض وأسود وألوان) من شهر البداية حتى سبتمبر 2026. باقي الأرقام تحويلات تقديرية من عدد الأوراق، وكل الافتراضات قابلة للتعديل.</span><span class="en">Pages saved = what would have been printed at the baseline average, minus what was actually printed, calculated per month and per type (black &amp; white and color) from the start month to September 2026. Everything else is an estimate converted from the sheet count, and every assumption below can be edited.</span></p>
+    </div>
+
+    <div class="itiles" id="itiles"></div>
+    <p class="runrate" id="runrate"></p>
+
+    <div class="cols2" style="margin-top:16px">
+      <div class="panel">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:2px"><span class="ar">الصفحات الموفّرة تراكمياً</span><span class="en">Cumulative pages saved</span></h3>
+        <p class="note" style="margin:0 0 6px"><span class="ar">الأعمدة الخفيفة = توفير كل شهر، والخط = المجموع التراكمي.</span><span class="en">Light bars = each month's saving; line = running total.</span></p>
+        <div class="chart" id="cumChart" dir="ltr"></div>
+      </div>
+      <div class="panel assume">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+          <h3 style="font-size:15px;font-weight:600"><span class="ar">الافتراضات</span><span class="en">Assumptions</span></h3>
+          <button type="button" class="reset" id="aReset"><span class="ar">استعادة القيم الافتراضية</span><span class="en">Reset to defaults</span></button>
+        </div>
+        <div class="fgrid">
+          <label class="fld"><span><span class="ar">خط الأساس</span><span class="en">Baseline</span></span>
+            <select id="a-base" dir="ltr"><option value="2324">2023–2024</option><option value="23">2023</option></select></label>
+          <label class="fld"><span><span class="ar">شهر بداية الحساب</span><span class="en">Start month</span></span>
+            <select id="a-start"></select></label>
+          <label class="fld"><span><span class="ar">تكلفة صفحة أبيض وأسود (درهم)</span><span class="en">B&amp;W cost per page (AED)</span></span><input id="a-bw" type="number" step="0.01" min="0"></label>
+          <label class="fld"><span><span class="ar">تكلفة صفحة ألوان (درهم)</span><span class="en">Color cost per page (AED)</span></span><input id="a-co" type="number" step="0.01" min="0"></label>
+          <label class="fld"><span><span class="ar">سعر رزمة ورق 500 ورقة (درهم)</span><span class="en">Price of a 500-sheet ream (AED)</span></span><input id="a-ream" type="number" step="0.5" min="0"></label>
+          <label class="fld"><span><span class="ar">نسبة الطباعة على الوجهين %</span><span class="en">Double-sided share %</span></span><input id="a-duplex" type="number" step="5" min="0" max="100"></label>
+          <label class="fld"><span><span class="ar">أوراق A4 من الشجرة الواحدة</span><span class="en">A4 sheets per tree</span></span><input id="a-spt" type="number" step="1" min="1"></label>
+          <label class="fld"><span><span class="ar">CO₂e لكل ورقة (جرام)</span><span class="en">CO₂e per sheet (g)</span></span><input id="a-co2" type="number" step="0.1" min="0"></label>
+          <label class="fld"><span><span class="ar">مياه لكل ورقة (لتر)</span><span class="en">Water per sheet (L)</span></span><input id="a-water" type="number" step="0.5" min="0"></label>
+          <label class="fld"><span><span class="ar">طاقة لكل ورقة (واط ساعة)</span><span class="en">Energy per sheet (Wh)</span></span><input id="a-wh" type="number" step="1" min="0"></label>
+        </div>
+        <p class="note"><span class="ar">تكلفة الصفحة تشمل الحبر والصيانة (سعر «النقرة» في عقود الطباعة)، وسعر الورق محسوب منفصلاً. ضع أسعار عقدكم الفعلية لنتيجة أدق. التعديلات محفوظة في متصفحك فقط.</span><span class="en">Cost per page covers toner and service (the "click" rate in print contracts); paper is priced separately. Enter your actual contract rates for a more accurate result. Your edits are saved in your browser only.</span></p>
+      </div>
+    </div>
+
+    <details class="sources">
+      <summary><span class="ar">مصادر معاملات التحويل</span><span class="en">Where the conversion factors come from</span></summary>
+      <ul class="notes">
+        <li><span class="ar"><b>الأشجار:</b> 8,333 ورقة A4 لكل شجرة (رزمة 500 ورقة ≈ 6% من شجرة)، وفق Conservatree ودراسة Tom Soder، وهو المعامل الافتراضي في برنامج PaperCut لإدارة الطباعة.</span><span class="en"><b>Trees:</b> 8,333 A4 sheets per tree (a 500-sheet ream ≈ 6% of a tree), from Conservatree and Tom Soder's study; also the default in PaperCut print management.</span></li>
+        <li><span class="ar"><b>الكربون:</b> 12.7 جرام CO₂e لكل ورقة، من حاسبة Environmental Paper Network (الإصدار 3.2) عبر PaperCut. مصادر أخرى تعطي حتى نحو 18 جراماً للورقة، فالرقم المستخدم متحفظ.</span><span class="en"><b>Carbon:</b> 12.7 g CO₂e per sheet, from the Environmental Paper Network Paper Calculator v3.2 via PaperCut. Other sources go up to about 18 g per sheet, so this figure is conservative.</span></li>
+        <li><span class="ar"><b>المياه:</b> بصمة مائية بين 2 و13 لتراً لورقة A4 (Van Oel &amp; Hoekstra، جامعة Twente)؛ استخدمنا 10 لترات.</span><span class="en"><b>Water:</b> a water footprint of 2–13 litres per A4 sheet (Van Oel &amp; Hoekstra, University of Twente); we use 10 litres.</span></li>
+        <li><span class="ar"><b>الطاقة:</b> 48 واط ساعة لإنتاج ورقة مكتبية من ألياف جديدة (32 للورق المعاد تدويره)، المعامل الافتراضي في PaperCut.</span><span class="en"><b>Energy:</b> 48 Wh to produce one virgin-fibre office sheet (32 Wh if recycled), the PaperCut default.</span></li>
+        <li><span class="ar"><b>الوزن والارتفاع:</b> ورقة A4 بوزن 80 جم/م² تزن 4.99 جرام، وسُمكها نحو 0.1 مم.</span><span class="en"><b>Weight and height:</b> an 80 gsm A4 sheet weighs 4.99 g and is about 0.1 mm thick.</span></li>
+        <li><span class="ar"><b>التكلفة:</b> عقود الطباعة المُدارة تحسب عادة 0.01–0.02 دولار للصفحة الأبيض والأسود و0.06–0.10 دولار للملونة (AOP)، أي نحو 0.06 و0.26 درهم. سعر الرزمة 18 درهماً تقدير لسعر السوق.</span><span class="en"><b>Cost:</b> managed print contracts typically charge $0.01–0.02 per B&amp;W page and $0.06–0.10 per color page (AOP), about AED 0.06 and 0.26. The AED 18 ream price is a market estimate.</span></li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="trend">
+    <div class="sh">
+      <h2><span class="ar">الاتجاه الشهري</span><span class="en">Monthly trend</span></h2>
+      <p><span class="ar">إجمالي الصفحات المطبوعة كل شهر، مع متوسط متحرك لثلاثة أشهر يوضح الاتجاه بعيداً عن تقلبات الشهر الواحد. مرّر المؤشر على الرسم لعرض تفاصيل أي شهر.</span><span class="en">Total pages printed each month, with a 3-month moving average that shows the direction beneath single-month swings. Hover the chart for any month's details.</span></p>
+    </div>
+    <div class="panel">
+      <div class="legend">
+        <span><i class="sw" style="background:var(--accent)"></i><span class="ar">إجمالي الطباعة</span><span class="en">Total printing</span></span>
+        <span><i class="sw dash"></i><span class="ar">متوسط متحرك 3 أشهر</span><span class="en">3-month moving average</span></span>
+      </div>
+      <div class="chart" id="trendChart" dir="ltr"></div>
+    </div>
+  </section>
+
+  <section id="years">
+    <div class="sh">
+      <h2><span class="ar">مقارنة السنوات</span><span class="en">Year against year</span></h2>
+      <p><span class="ar">بيانات 2026 تغطي تسعة أشهر فقط، لذلك تقارن الأشرطة الفترة نفسها (يناير–سبتمبر) في كل عام، ويقارن الجدول متوسط الشهر.</span><span class="en">2026 covers only nine months, so the bars compare the same period (January to September) in every year, and the table compares the monthly average.</span></p>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <div class="legend">
+          <span><i class="sw box" style="background:var(--bw)"></i><span class="ar">أبيض وأسود</span><span class="en">Black &amp; white</span></span>
+          <span><i class="sw box" style="background:var(--color)"></i><span class="ar">ألوان</span><span class="en">Color</span></span>
+        </div>
+        <h3 style="font-size:15px;font-weight:600;margin-block:4px 14px"><span class="ar">إجمالي يناير–سبتمبر</span><span class="en">January–September totals</span></h3>
+        <div class="ybars" id="ybars"></div>
+      </div>
+      <div class="panel scroll">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px"><span class="ar">السنة الكاملة</span><span class="en">Full years</span></h3>
+        <table id="ytable"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="months">
+    <div class="sh">
+      <h2><span class="ar">الفرق بين الشهور</span><span class="en">Month by month</span></h2>
+      <p><span class="ar">كل خلية شهر واحد، ويزداد لونها قتامة كلما زادت الطباعة. اقرأ العمود من أعلى لأسفل لمقارنة الشهر نفسه عبر السنوات.</span><span class="en">Each cell is one month; darker means more printing. Read down a column to compare the same month across years.</span></p>
+    </div>
+    <div class="panel">
+      <div class="scroll"><div class="heat" id="heat"></div></div>
+      <div class="scale"><span>0</span><span class="bar2"></span><span>30,192</span></div>
+    </div>
+  </section>
+
+  <section id="mix">
+    <div class="sh">
+      <h2><span class="ar">أبيض وأسود مقابل ألوان</span><span class="en">Black &amp; white vs color</span></h2>
+      <p><span class="ar">انخفضت الطباعة الملونة أسرع بكثير من الأبيض والأسود. في فترة يناير–سبتمبر تراجعت الألوان 78.9% عن 2023 (من 97,550 إلى 20,610)، بينما تراجع الأبيض والأسود 43.1% (من 45,252 إلى 25,765).</span><span class="en">Color printing fell much faster than black &amp; white. For January–September, color is down 78.9% from 2023 (97,550 to 20,610), while black &amp; white is down 43.1% (45,252 to 25,765).</span></p>
+    </div>
+    <div class="panel">
+      <div class="legend">
+        <span><i class="sw box" style="background:var(--bw)"></i><span class="ar">أبيض وأسود</span><span class="en">Black &amp; white</span></span>
+        <span><i class="sw box" style="background:var(--color)"></i><span class="ar">ألوان</span><span class="en">Color</span></span>
+      </div>
+      <div class="chart" id="mixChart" dir="ltr"></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:4px"><span class="ar">نسبة الصفحات الملونة من إجمالي كل شهر</span><span class="en">Color pages as a share of each month</span></h3>
+      <p class="note" style="margin:0 0 6px"><span class="ar">تحت خط 50% يعني أن الأبيض والأسود صار الأغلب. حدث ذلك في 6 من أشهر 2026 التسعة.</span><span class="en">Below the 50% line, black &amp; white is the majority. That happened in 6 of the 9 months of 2026.</span></p>
+      <div class="chart" id="shareChart" dir="ltr"></div>
+    </div>
+  </section>
+
+  <section id="facts">
+    <div class="sh"><h2><span class="ar">أرقام لافتة</span><span class="en">Highlights</span></h2></div>
+    <div class="facts">
+      <div class="fact"><div class="t"><span class="ar">أعلى شهر</span><span class="en">Highest month</span></div><div class="v num">30,192</div><p><span class="ar">يونيو 2024، في مرحلة خط الأساس.</span><span class="en">June 2024, during the baseline phase.</span></p></div>
+      <div class="fact"><div class="t"><span class="ar">أقل شهر</span><span class="en">Lowest month</span></div><div class="v num">3,728</div><p><span class="ar">يونيو 2026، أقل بـ 87.7% من الذروة. وفيه أقل طباعة ملونة على الإطلاق: 275 صفحة.</span><span class="en">June 2026, 87.7% below the peak. It also had the least color printing on record: 275 pages.</span></p></div>
+      <div class="fact"><div class="t"><span class="ar">آخر 12 شهراً</span><span class="en">Last 12 months</span></div><div class="v num">66,715</div><p><span class="ar">من أكتوبر 2025 حتى سبتمبر 2026، أقل بـ 66.7% من إجمالي 2023 (200,407).</span><span class="en">October 2025 to September 2026, 66.7% below the 2023 total (200,407).</span></p></div>
+      <div class="fact"><div class="t"><span class="ar">أشهر متتالية</span><span class="en">Months in a row</span></div><div class="v num">17</div><p><span class="ar">كل شهر من مايو 2025 حتى سبتمبر 2026 جاء أقل من نفس الشهر في العام السابق.</span><span class="en">Every month from May 2025 to September 2026 came in below the same month a year earlier.</span></p></div>
+      <div class="fact"><div class="t"><span class="ar">تحت 10,000 صفحة</span><span class="en">Under 10,000 pages</span></div><div class="v num">13</div><p><span class="ar">شهراً متتالياً، من سبتمبر 2025 حتى سبتمبر 2026. في 2023 و2024 لم يحدث هذا إلا 3 مرات.</span><span class="en">Months in a row, September 2025 to September 2026. In 2023 and 2024 this happened only 3 times.</span></p></div>
+      <div class="fact"><div class="t"><span class="ar">2023 مقابل 2024</span><span class="en">2023 vs 2024</span></div><div class="v num">+0.3%</div><p><span class="ar">العامان شبه متطابقين (200,407 و200,913)، وهو ما يجعلهما خط أساس واضحاً للمقارنة.</span><span class="en">The two years are nearly identical (200,407 and 200,913), which makes them a clean baseline.</span></p></div>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="sh">
+      <h2><span class="ar">البيانات الكاملة</span><span class="en">Full data</span></h2>
+      <p><span class="ar">كل الأشهر كما وردت في الملف، مع نسبة التغير عن الشهر السابق وعن نفس الشهر في العام السابق. الأخضر ▼ يعني طباعة أقل.</span><span class="en">Every month as it appears in the file, with the change from the previous month and from the same month a year earlier. Green ▼ means less printing.</span></p>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Year"></div>
+    <div class="panel scroll" style="padding:0"><table id="dtable"></table></div>
+  </section>
+
+  <footer><span class="ar">مشروع صفر ورق · آخر شهر في البيانات: سبتمبر 2026</span><span class="en">Zero Paper Project · Latest month in the data: September 2026</span></footer>
+</main>
+</div>
+
+<script>
+(function(){
+const RAW=[["JAN'2023",7163,11504,18668],["FEB'2023",6087,13719,19807],["MAR'2023",3487,10394,13882],["APR'2023",2663,11396,14060],["MAY'2023",6321,18406,24728],["JUN'2023",3281,4745,8027],["JUL'2023",3931,6041,9972],["AUG'2023",7770,14095,21866],["SEP'2023",4549,7250,11799],["OCT'2023",16054,11454,27508],["NOV'2023",5606,9414,15021],["DEC'2023",5370,9698,15069],["JAN'2024",5443,11652,17095],["FEB'2024",11678,719,12397],["MAR'2024",10277,17204,27481],["APR'2024",3969,5436,9405],["MAY'2024",5245,7804,13049],["JUN'2024",11680,18512,30192],["JUL'2024",6195,8837,15032],["AUG'2024",5278,6670,11948],["SEP'2024",3227,9800,13027],["OCT'2024",7369,12003,19373],["NOV'2024",4280,10744,15024],["DEC'2024",5102,11788,16890],["JAN'2025",4684,5849,10530],["FEB'2025",4258,6804,11062],["MAR'2025",3372,5809,9181],["APR'2025",3116,6770,10537],["MAY'2025",2461,5425,7886],["JUN'2025",1511,4365,6299],["JUL'2025",3069,4226,7295],["AUG'2025",2762,7699,10461],["SEP'2025",2649,4658,7307],["OCT'2025",2120,3750,6271],["NOV'2025",2384,3870,6913],["DEC'2025",2166,3531,6357],["JAN'2026",2940,3145,6085],["FEB'2026",2130,3161,5291],["MAR'2026",2337,2192,4529],["APR'2026",2999,3110,6109],["MAY'2026",2264,1883,4147],["JUN'2026",3453,275,3728],["JUL'2026",3113,2296,5409],["AUG'2026",3580,1707,5663],["SEP'2026",2949,2841,6213]];
+const KEYS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const M={en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+         enL:['January','February','March','April','May','June','July','August','September','October','November','December'],
+         ar:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']};
+const T={
+ ar:{total:'الإجمالي',bw:'أبيض وأسود',color:'ألوان',avg3:'متوسط 3 أشهر',mom:'عن الشهر السابق',yoy:'عن نفس الشهر العام السابق',month:'الشهر',share:'نسبة الألوان',all:'الكل',year:'السنة',months:'الأشهر',avg:'متوسط الشهر',chg:'تغير المتوسط',vs23:'عن 2023',peak:'الذروة',avgCol:'المتوسط',ytdNote:'(7 أشهر)'},
+ en:{total:'Total',bw:'Black & white',color:'Color',avg3:'3-month avg',mom:'vs previous month',yoy:'vs same month last year',month:'Month',share:'Color share',all:'All',year:'Year',months:'Months',avg:'Avg / month',chg:'Change in avg',vs23:'vs 2023',peak:'Peak',avgCol:'Average',ytdNote:'(7 mo)'}
+};
+const rows=RAW.map((r,i)=>{const [k,y]=r[0].split("'");return {i,y:+y,m:KEYS.indexOf(k),bw:r[1],c:r[2],t:r[3]}});
+rows.forEach((r,i)=>{
+  r.mom=i?(r.t/rows[i-1].t-1)*100:null;
+  const p=rows.find(q=>q.y===r.y-1&&q.m===r.m); r.yoy=p?(r.t/p.t-1)*100:null;
+  r.avg3=i>=2?(rows[i].t+rows[i-1].t+rows[i-2].t)/3:null;
+  r.share=r.c/(r.bw+r.c)*100;
+});
+const YEARS=[2023,2024,2025,2026];
+let lang='ar';
+try{const s=localStorage.getItem('zp-lang'); if(s==='en'||s==='ar') lang=s;}catch(e){}
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const pct=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';
+const mname=(r,long)=>lang==='ar'?M.ar[r.m]+' '+r.y:(long?M.enL:M.en)[r.m]+' '+r.y;
+const t=k=>T[lang][k];
+const deltaCls=v=>v==null?'na':v<0?'down':'up';
+const deltaHTML=v=>v==null?'<span class="delta na">—</span>':`<span class="delta ${deltaCls(v)}"><bdi>${v<0?'▼':'▲'} ${pct(v)}</bdi></span>`;
+
+function tip(host){let d=host.querySelector('.tip');if(!d){d=document.createElement('div');d.className='tip';d.hidden=true;host.appendChild(d)}return d}
+function placeTip(host,d,x,y){const W=host.clientWidth;d.hidden=false;d.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  const w=d.offsetWidth;let left=x+14;if(left+w>W)left=x-14-w;if(left<0)left=Math.max(0,Math.min(W-w,x-w/2));
+  d.style.left=left+'px';d.style.top=Math.max(0,y)+'px';}
+function niceTicks(max,count){const raw=max/count;const p=Math.pow(10,Math.floor(Math.log10(raw)));const s=[1,2,2.5,5,10].map(m=>m*p).find(v=>v>=raw);const out=[];for(let v=0;v<=max+1e-9;v+=s)out.push(v);return out}
+const kfmt=v=>v>=1000?(v/1000)+'k':String(v);
+
+/* ---------- hero paper stacks ---------- */
+function drawStacks(){
+  const host=document.getElementById('stacks');const W=host.clientWidth;const H=Math.min(260,Math.max(200,W*0.5));
+  const avgs=YEARS.map(y=>{const s=rows.filter(r=>r.y===y);return s.reduce((a,r)=>a+r.t,0)/s.length});
+  const max=Math.max(...avgs);const top=44,bot=40;const ih=H-top-bot;const n=YEARS.length;const slot=W/n;const sw=Math.min(96,slot*0.66);
+  let g='';
+  YEARS.forEach((y,i)=>{
+    const cx=slot*i+slot/2;const h=avgs[i]/max*ih;const base=H-bot;const sheets=Math.max(1,Math.round(h/3.2));const step=h/sheets;
+    for(let k=0;k<sheets;k++){const j=((k*37+i*11)%7-3)*0.7;g+=`<rect x="${(cx-sw/2+j).toFixed(1)}" y="${(base-(k+1)*step).toFixed(1)}" width="${sw}" height="${step.toFixed(2)}" rx="0.6" style="fill:var(--paper);stroke:var(--paper-edge);stroke-width:.6"/>`}
+    g+=`<text x="${cx}" y="${base-h-12}" text-anchor="middle" class="ann" style="font-size:${W<420?13:16}px;fill:${i===n-1?'var(--accent)':'var(--fg)'}">${fmt(avgs[i])}</text>`;
+    g+=`<text x="${cx}" y="${base+20}" text-anchor="middle" class="yearlab">${y}${y===2026?'*':''}</text>`;
+  });
+  g+=`<line x1="0" x2="${W}" y1="${H-bot}" y2="${H-bot}" class="base"/>`;
+  g+=`<text x="${W}" y="${H-4}" text-anchor="end">${lang==='ar'?'* يناير–سبتمبر':'* Jan–Sep'}</text>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Average monthly pages by year">${g}</svg>`;
+}
+
+/* ---------- shared time axis ---------- */
+function timeFrame(host,H,ymax,ticks,yf,m){
+  const W=host.clientWidth;const n=rows.length;const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const y=v=>m.t+ih*(1-v/ymax);
+  let g='<g class="grid">';ticks.forEach(v=>{g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}"/>`});g+='</g><g class="yl">';
+  ticks.forEach(v=>{g+=`<text x="${m.l-8}" y="${y(v)+4}">${yf(v)}</text>`});g+='</g>';
+  return {W,n,iw,ih,y,g};
+}
+function yearMarks(xc,f,m,H,band){
+  let g='';
+  rows.forEach((r,i)=>{if(r.m===0&&i>0){const xx=band?f.x0(i):(xc(i)+xc(i-1))/2;g+=`<line class="ysep" x1="${xx}" x2="${xx}" y1="${m.t-18}" y2="${H-m.b}"/>`}});
+  YEARS.forEach(yy=>{const idx=rows.filter(r=>r.y===yy).map(r=>r.i);const mid=(xc(idx[0])+xc(idx[idx.length-1]))/2;g+=`<text class="yearlab" x="${mid}" y="${m.t-8}" text-anchor="middle">${yy}</text>`});
+  const lab=f.W>760?[0,3,6,9]:[0,6];
+  rows.forEach((r,i)=>{if(lab.includes(r.m))g+=`<text x="${xc(i)}" y="${H-m.b+18}" text-anchor="middle" style="font-family:var(--f-body)">${(lang==='ar'?M.ar:M.en)[r.m]}</text>`});
+  return g;
+}
+
+/* ---------- trend ---------- */
+function drawTrend(){
+  const host=document.getElementById('trendChart');const W0=host.clientWidth;const H=W0<560?280:360;
+  const m={t:34,r:16,b:30,l:44};const ymax=32000;
+  const f=timeFrame(host,H,ymax,[0,10000,20000,30000],kfmt,m);
+  const x=i=>m.l+f.iw*i/(f.n-1);
+  let g=f.g+yearMarks(x,f,m,H,false);
+  const pts=rows.map((r,i)=>[x(i),f.y(r.t)]);
+  g+=`<path class="area" d="M${pts[0][0]},${f.y(0)} L${pts.map(p=>p.join(',')).join(' L')} L${pts[pts.length-1][0]},${f.y(0)} Z"/>`;
+  g+=`<line class="base" x1="${m.l}" x2="${f.W-m.r}" y1="${f.y(0)}" y2="${f.y(0)}"/>`;
+  g+=`<path class="avg" d="M${rows.filter(r=>r.avg3!=null).map(r=>x(r.i)+','+f.y(r.avg3)).join(' L')}"/>`;
+  g+=`<path class="tot" d="M${pts.map(p=>p.join(',')).join(' L')}"/>`;
+  const pk=rows.reduce((a,r)=>r.t>a.t?r:a);const last=rows[rows.length-1];
+  g+=`<circle class="dot" r="4.5" cx="${x(pk.i)}" cy="${f.y(pk.t)}"/><text class="ann" x="${x(pk.i)+9}" y="${f.y(pk.t)+4}" text-anchor="start">${fmt(pk.t)}</text>`;
+  g+=`<circle class="dot" r="5" cx="${x(last.i)}" cy="${f.y(last.t)}"/><text class="ann" x="${x(last.i)}" y="${f.y(last.t)-12}" text-anchor="end">${fmt(last.t)}</text>`;
+  g+=`<g id="tg" style="display:none"><line class="guide" y1="${m.t-4}" y2="${H-m.b}"/><circle class="dot" r="5"/></g>`;
+  g+=`<rect class="hit" x="${m.l}" y="${m.t}" width="${f.iw}" height="${f.ih}"/>`;
+  host.innerHTML=`<svg viewBox="0 0 ${f.W} ${H}" width="${f.W}" height="${H}" role="img" aria-label="Monthly total printing, Jan 2023 to Sep 2026">${g}</svg>`;
+  const svg=host.querySelector('svg'),tg=svg.querySelector('#tg'),d=tip(host);
+  svg.querySelector('.hit').addEventListener('pointermove',e=>{
+    const b=svg.getBoundingClientRect();const px=(e.clientX-b.left)*f.W/b.width;
+    const i=Math.max(0,Math.min(f.n-1,Math.round((px-m.l)/f.iw*(f.n-1))));const r=rows[i];
+    tg.style.display='';tg.querySelector('line').setAttribute('x1',x(i));tg.querySelector('line').setAttribute('x2',x(i));
+    const c=tg.querySelector('circle');c.setAttribute('cx',x(i));c.setAttribute('cy',f.y(r.t));
+    d.innerHTML=`<b>${mname(r,true)}</b><div class="r"><span>${t('total')}</span><span>${fmt(r.t)}</span></div><div class="r"><span><i class="sw box" style="background:var(--bw)"></i>${t('bw')}</span><span>${fmt(r.bw)}</span></div><div class="r"><span><i class="sw box" style="background:var(--color)"></i>${t('color')}</span><span>${fmt(r.c)}</span></div><div class="r"><span>${t('avg3')}</span><span>${r.avg3?fmt(r.avg3):'—'}</span></div><div class="r"><span>${t('mom')}</span><span dir="ltr">${pct(r.mom)}</span></div><div class="r"><span>${t('yoy')}</span><span dir="ltr">${pct(r.yoy)}</span></div>`;
+    placeTip(host,d,x(i)*b.width/f.W,f.y(r.t)*b.height/H-40);
+  });
+  svg.querySelector('.hit').addEventListener('pointerleave',()=>{tg.style.display='none';d.hidden=true});
+}
+
+/* ---------- B&W vs color stacked ---------- */
+function drawMix(){
+  const host=document.getElementById('mixChart');const W0=host.clientWidth;const H=W0<560?260:320;
+  const m={t:34,r:10,b:30,l:44};const ymax=32000;
+  const f=timeFrame(host,H,ymax,[0,10000,20000,30000],kfmt,m);
+  const band=f.iw/f.n;f.x0=i=>m.l+band*i;const xc=i=>m.l+band*(i+.5);const bwid=Math.max(2,band*0.68);
+  let g=f.g+yearMarks(xc,f,m,H,true);
+  g+='<g id="hl"></g>';
+  rows.forEach((r,i)=>{
+    const x0=xc(i)-bwid/2;const yb=f.y(r.bw),yc=f.y(r.bw+r.c);const base=f.y(0);
+    g+=`<rect class="bwb" x="${x0}" y="${yb}" width="${bwid}" height="${Math.max(0,base-yb)}" rx="1"/>`;
+    const ch=Math.max(0,yb-yc-1.5);if(ch>0)g+=`<rect class="cob" x="${x0}" y="${yc}" width="${bwid}" height="${ch}" rx="1"/>`;
+  });
+  g+=`<line class="base" x1="${m.l}" x2="${f.W-m.r}" y1="${f.y(0)}" y2="${f.y(0)}"/>`;
+  rows.forEach((r,i)=>{g+=`<rect class="hit" data-i="${i}" x="${f.x0(i)}" y="${m.t}" width="${band}" height="${f.ih}"/>`});
+  host.innerHTML=`<svg viewBox="0 0 ${f.W} ${H}" width="${f.W}" height="${H}" role="img" aria-label="Monthly black and white vs color pages">${g}</svg>`;
+  const svg=host.querySelector('svg'),d=tip(host),hl=svg.querySelector('#hl');
+  svg.querySelectorAll('.hit').forEach(el=>{
+    el.addEventListener('pointerenter',()=>{const i=+el.dataset.i,r=rows[i];const b=svg.getBoundingClientRect();
+      hl.innerHTML=`<rect class="hl" x="${f.x0(i)}" y="${m.t}" width="${band}" height="${f.ih}"/>`;
+      d.innerHTML=`<b>${mname(r,true)}</b><div class="r"><span><i class="sw box" style="background:var(--bw)"></i>${t('bw')}</span><span>${fmt(r.bw)}</span></div><div class="r"><span><i class="sw box" style="background:var(--color)"></i>${t('color')}</span><span>${fmt(r.c)}</span></div><div class="r"><span>${t('share')}</span><span>${r.share.toFixed(1)}%</span></div>`;
+      placeTip(host,d,xc(i)*b.width/f.W,f.y(r.bw+r.c)*b.height/H-30);});
+    el.addEventListener('pointerleave',()=>{hl.innerHTML='';d.hidden=true});
+  });
+}
+
+/* ---------- color share ---------- */
+function drawShare(){
+  const host=document.getElementById('shareChart');const H=200;
+  const m={t:30,r:16,b:30,l:44};
+  const f=timeFrame(host,H,100,[0,25,50,75,100],v=>v+'%',m);
+  const x=i=>m.l+f.iw*i/(f.n-1);
+  let g=f.g+yearMarks(x,f,m,H,false);
+  g+=`<line class="ref" x1="${m.l}" x2="${f.W-m.r}" y1="${f.y(50)}" y2="${f.y(50)}"/>`;
+  g+=`<path class="shareline" d="M${rows.map(r=>x(r.i)+','+f.y(r.share)).join(' L')}"/>`;
+  rows.forEach(r=>{if(r.share<50)g+=`<circle r="3.5" cx="${x(r.i)}" cy="${f.y(r.share)}" style="fill:var(--surface);stroke:var(--color);stroke-width:2"/>`});
+  g+=`<g id="sg" style="display:none"><line class="guide" y1="${m.t}" y2="${H-m.b}"/><circle r="5" style="fill:var(--color);stroke:var(--surface);stroke-width:2"/></g>`;
+  g+=`<rect class="hit" x="${m.l}" y="${m.t}" width="${f.iw}" height="${f.ih}"/>`;
+  host.innerHTML=`<svg viewBox="0 0 ${f.W} ${H}" width="${f.W}" height="${H}" role="img" aria-label="Color share of monthly printing">${g}</svg>`;
+  const svg=host.querySelector('svg'),sg=svg.querySelector('#sg'),d=tip(host);
+  svg.querySelector('.hit').addEventListener('pointermove',e=>{
+    const b=svg.getBoundingClientRect();const px=(e.clientX-b.left)*f.W/b.width;
+    const i=Math.max(0,Math.min(f.n-1,Math.round((px-m.l)/f.iw*(f.n-1))));const r=rows[i];
+    sg.style.display='';const l=sg.querySelector('line');l.setAttribute('x1',x(i));l.setAttribute('x2',x(i));
+    const c=sg.querySelector('circle');c.setAttribute('cx',x(i));c.setAttribute('cy',f.y(r.share));
+    d.innerHTML=`<b>${mname(r,true)}</b><div class="r"><span>${t('share')}</span><span>${r.share.toFixed(1)}%</span></div><div class="r"><span>${t('color')}</span><span>${fmt(r.c)}</span></div><div class="r"><span>${t('bw')}</span><span>${fmt(r.bw)}</span></div>`;
+    placeTip(host,d,x(i)*b.width/f.W,10);
+  });
+  svg.querySelector('.hit').addEventListener('pointerleave',()=>{sg.style.display='none';d.hidden=true});
+}
+
+/* ---------- Jan–Jul bars + year table ---------- */
+function drawYears(){
+  const per=YEARS.map(y=>{const s=rows.filter(r=>r.y===y&&r.m<=rows[rows.length-1].m);return {y,bw:s.reduce((a,r)=>a+r.bw,0),c:s.reduce((a,r)=>a+r.c,0),t:s.reduce((a,r)=>a+r.t,0)}});
+  const max=Math.max(...per.map(p=>p.bw+p.c));const b0=per[0].t;
+  document.getElementById('ybars').innerHTML=per.map(p=>{const ch=(p.t/b0-1)*100;
+    return `<div class="yrow"><div class="y">${p.y}</div><div class="track" title="${t('bw')}: ${fmt(p.bw)} · ${t('color')}: ${fmt(p.c)}"><div style="width:${p.bw/max*100}%;background:var(--bw)"></div><div style="width:${p.c/max*100}%;background:var(--color)"></div></div><div class="vals"><span class="num">${fmt(p.t)}</span>${p.y===2023?`<span class="note" style="margin:0">${lang==='ar'?'سنة المقارنة':'Reference year'}</span>`:`<span style="font-size:13px">${deltaHTML(ch)} <span style="color:var(--muted)">${t('vs23')}</span></span>`}</div></div>`}).join('');
+  let prev=null;
+  const rowsY=YEARS.map(y=>{const s=rows.filter(r=>r.y===y);const tot=s.reduce((a,r)=>a+r.t,0);const avg=tot/s.length;const o={y,n:s.length,tot,avg,ch:prev?(avg/prev-1)*100:null};prev=avg;return o});
+  document.getElementById('ytable').innerHTML=`<thead><tr><th>${t('year')}</th><th class="n">${t('months')}</th><th class="n">${t('total')}</th><th class="n">${t('avg')}</th><th class="n">${t('chg')}</th></tr></thead><tbody>`+
+    rowsY.map(o=>`<tr><td style="font-family:var(--f-display);font-weight:600">${o.y}</td><td class="n">${o.n}</td><td class="n">${fmt(o.tot)}</td><td class="n">${fmt(o.avg)}</td><td class="n">${deltaHTML(o.ch)}</td></tr>`).join('')+'</tbody>';
+}
+
+/* ---------- heatmap ---------- */
+function drawHeat(){
+  const max=Math.max(...rows.map(r=>r.t));const mn=lang==='ar'?M.ar:M.en;
+  let h=`<div class="h"></div>`+mn.map(s=>`<div class="h">${s}</div>`).join('')+`<div class="h">${t('avgCol')}</div>`;
+  YEARS.forEach(y=>{
+    h+=`<div class="yl">${y}</div>`;
+    const s=rows.filter(r=>r.y===y);
+    for(let mi=0;mi<12;mi++){const r=s.find(q=>q.m===mi);
+      if(!r){h+=`<div class="c empty">—</div>`;continue}
+      const p=8+86*(r.t/max);const ink=p>48?'var(--accent-ink)':'var(--fg)';
+      h+=`<div class="c" style="background:color-mix(in oklab,var(--accent) ${p.toFixed(0)}%,var(--surface));color:${ink}" title="${mname(r,true)}: ${fmt(r.t)} · ${t('yoy')}: ${pct(r.yoy)}">${(r.t/1000).toFixed(1)}k</div>`}
+    h+=`<div class="avgc">${(s.reduce((a,r)=>a+r.t,0)/s.length/1000).toFixed(1)}k</div>`;
+  });
+  document.getElementById('heat').innerHTML=h;
+}
+
+/* ---------- data table ---------- */
+let yf='all';
+function drawTable(){
+  const fl=document.getElementById('filters');
+  fl.innerHTML=['all',...YEARS].map(v=>`<button type="button" id="f-${v}" data-v="${v}" aria-pressed="${String(v)===String(yf)}">${v==='all'?t('all'):v}</button>`).join('');
+  fl.querySelectorAll('button').forEach(b=>b.onclick=()=>{yf=b.dataset.v;drawTable()});
+  const list=rows.filter(r=>yf==='all'||r.y===+yf);
+  document.getElementById('dtable').innerHTML=`<thead><tr><th>${t('month')}</th><th class="n">${t('bw')}</th><th class="n">${t('color')}</th><th class="n">${t('total')}</th><th class="n">${t('mom')}</th><th class="n">${t('yoy')}</th></tr></thead><tbody>`+
+   list.map((r,k)=>`<tr class="${k&&r.m===0?'ysep':''}"><td>${mname(r,true)}</td><td class="n">${fmt(r.bw)}</td><td class="n">${fmt(r.c)}</td><td class="n" style="font-weight:600">${fmt(r.t)}</td><td class="n">${deltaHTML(r.mom)}</td><td class="n">${deltaHTML(r.yoy)}</td></tr>`).join('')+'</tbody>';
+}
+
+/* ---------- impact estimates ---------- */
+const DEF={base:'2324',start:'2025-01',bw:0.06,co:0.26,ream:18,duplex:0,spt:8333,co2:12.7,water:10,wh:48};
+const SHEET_G=4.99, SHEET_MM=0.1;
+let A=Object.assign({},DEF);
+try{const s=JSON.parse(localStorage.getItem('zp-assume')||'null');if(s)A=Object.assign(A,s)}catch(e){}
+const NUMK=['bw','co','ream','duplex','spt','co2','water','wh'];
+function calcImpact(){
+  const bR=rows.filter(r=>A.base==='23'?r.y===2023:(r.y===2023||r.y===2024));
+  const bBW=bR.reduce((a,r)=>a+r.bw,0)/bR.length, bC=bR.reduce((a,r)=>a+r.c,0)/bR.length;
+  const [sy,sm]=A.start.split('-').map(Number);
+  const per=rows.filter(r=>r.y>sy||(r.y===sy&&r.m>=sm-1));
+  let cum=0;const months=per.map(r=>{const s=(bBW-r.bw)+(bC-r.c);cum+=s;return {r,sbw:bBW-r.bw,sc:bC-r.c,s,cum}});
+  const sbw=months.reduce((a,m)=>a+m.sbw,0), sc=months.reduce((a,m)=>a+m.sc,0);
+  const last12=rows.slice(-12);const rbw=bBW*12-last12.reduce((a,r)=>a+r.bw,0), rc=bC*12-last12.reduce((a,r)=>a+r.c,0);
+  return {bBW,bC,months,sbw,sc,rbw,rc};
+}
+function metrics(sbw,sc){
+  const pages=sbw+sc;const sheets=pages*(1-Math.min(100,Math.max(0,A.duplex))/200);
+  return {pages,sheets,reams:sheets/500,height:sheets*SHEET_MM/1000,kg:sheets*SHEET_G/1000,trees:sheets/A.spt,co2:sheets*A.co2/1000,water:sheets*A.water,kwh:sheets*A.wh/1000,
+    cost:sbw*A.bw+sc*A.co+sheets/500*A.ream};
+}
+const big=(v,dec)=>{const a=Math.abs(v);if(a>=1e6)return [(v/1e6).toFixed(2),lang==='ar'?'مليون':'M'];return [v.toLocaleString('en-US',{maximumFractionDigits:dec||0}),'']};
+function tile(k,v,u,s,lead){return `<div class="itile${lead?' lead':''}"><div class="k">${k}</div><div class="v"><bdi class="num" style="font-family:var(--f-display)">${v}</bdi> <span class="u">${u}</span></div>${s?`<div class="s">${s}</div>`:''}</div>`}
+function drawImpact(){
+  const ar=lang==='ar';const I=calcImpact();const M_=metrics(I.sbw,I.sc);
+  const first=I.months[0].r,last=I.months[I.months.length-1].r;
+  const period=`${mname(first,true)} – ${mname(last,true)} (${I.months.length} ${ar?'شهراً':'months'})`;
+  const co2=M_.co2>=1000?[(M_.co2/1000).toFixed(2),ar?'طن CO₂e':'t CO₂e']:[fmt(M_.co2),ar?'كجم CO₂e':'kg CO₂e'];
+  const w=big(M_.water);const kwh=big(M_.kwh);
+  const tiles=[
+    tile(ar?'صفحات موفّرة':'Pages saved',fmt(M_.pages),ar?'صفحة':'pages',period,true),
+    tile(ar?'التوفير المالي التقديري':'Estimated cost saved',fmt(M_.cost),ar?'درهم':'AED',`${ar?'منها ورق':'paper'}: ${fmt(M_.reams*A.ream)}`,true),
+    tile(ar?'أوراق A4 موفّرة':'A4 sheets saved',fmt(M_.sheets),ar?'ورقة':'sheets',A.duplex>0?(ar?`بعد احتساب ${A.duplex}% على الوجهين`:`after ${A.duplex}% double-sided`):(ar?'صفحة = ورقة':'1 page = 1 sheet')),
+    tile(ar?'رزم ورق':'Reams of paper',fmt(M_.reams),ar?'رزمة':'reams',ar?'500 ورقة للرزمة':'500 sheets each'),
+    tile(ar?'ارتفاع الأوراق لو رُصّت':'Height if stacked',M_.height.toFixed(1),ar?'متر':'m',ar?`≈ ${(M_.height/3).toFixed(1)} طابق`:`≈ ${(M_.height/3).toFixed(1)} storeys`),
+    tile(ar?'ورق لم يُستهلك':'Paper not used',fmt(M_.kg),ar?'كجم':'kg',ar?'نفايات ورقية أقل':'less paper waste'),
+    tile(ar?'أشجار محفوظة':'Trees saved',M_.trees.toFixed(1),ar?'شجرة':'trees',`${fmt(A.spt)} ${ar?'ورقة لكل شجرة':'sheets per tree'}`),
+    tile(ar?'انبعاثات تم تجنبها':'Emissions avoided',co2[0],co2[1],`${A.co2} ${ar?'جم لكل ورقة':'g per sheet'}`),
+    tile(ar?'مياه موفّرة':'Water saved',w[0],(w[1]?w[1]+' ':'')+(ar?'لتر':'L'),`${A.water} ${ar?'لتر لكل ورقة':'L per sheet'}`),
+    tile(ar?'طاقة إنتاج موفّرة':'Production energy saved',kwh[0],(kwh[1]?kwh[1]+' ':'')+'kWh',`${A.wh} ${ar?'واط ساعة لكل ورقة':'Wh per sheet'}`)
+  ];
+  document.getElementById('itiles').innerHTML=tiles.join('');
+  const R=metrics(I.rbw,I.rc);
+  document.getElementById('runrate').innerHTML=ar
+    ?`بالمعدل الحالي (آخر 12 شهراً: ${mname(rows[rows.length-12])} – ${mname(rows[rows.length-1])}) يوفّر المشروع سنوياً نحو <b class="num">${fmt(R.pages)}</b> صفحة، و<b class="num">${fmt(R.cost)}</b> درهم، و<b class="num">${R.trees.toFixed(1)}</b> شجرة، و<b class="num">${(R.co2/1000).toFixed(2)}</b> طن CO₂e، مقارنة بسنة خط الأساس.`
+    :`At the current rate (last 12 months: ${mname(rows[rows.length-12])} – ${mname(rows[rows.length-1])}) the project saves about <b class="num">${fmt(R.pages)}</b> pages, <b class="num">AED ${fmt(R.cost)}</b>, <b class="num">${R.trees.toFixed(1)}</b> trees and <b class="num">${(R.co2/1000).toFixed(2)}</b> t CO₂e a year compared with a baseline year.`;
+  drawCum(I);
+}
+function drawCum(I){
+  const host=document.getElementById('cumChart');const W=host.clientWidth;const H=W<480?230:270;
+  const m={t:20,r:14,b:30,l:52};const n=I.months.length;const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const vals=I.months.map(d=>d.cum).concat(I.months.map(d=>d.s));
+  const maxV=Math.max(1,...vals),minV=Math.min(0,...vals);const ticks=niceTicks(maxV,4);const top=ticks[ticks.length-1]>=maxV?ticks[ticks.length-1]:maxV;
+  const y=v=>m.t+ih*(1-(v-minV)/(top-minV));const band=iw/n;const xc=i=>m.l+band*(i+.5);
+  let g='<g class="grid">';ticks.forEach(v=>g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}"/>`);g+='</g><g class="yl">';
+  ticks.forEach(v=>g+=`<text x="${m.l-8}" y="${y(v)+4}">${kfmt(v)}</text>`);g+='</g>';
+  I.months.forEach((d,i)=>{const y0=y(0),y1=y(d.s);g+=`<rect class="savb${d.s<0?' neg':''}" x="${xc(i)-band*.34}" y="${Math.min(y0,y1)}" width="${band*.68}" height="${Math.abs(y1-y0)}" rx="1"/>`});
+  I.months.forEach((d,i)=>{if(d.r.m===0||i===0)g+=`<text x="${xc(i)}" y="${H-m.b+18}" text-anchor="middle" style="font-family:var(--f-body)">${(lang==='ar'?M.ar:M.en)[d.r.m]} ${String(d.r.y).slice(2)}</text>`});
+  g+=`<line class="base" x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}"/>`;
+  g+=`<path class="tot" d="M${I.months.map((d,i)=>xc(i)+','+y(d.cum)).join(' L')}"/>`;
+  const L=I.months[n-1];g+=`<circle class="dot" r="5" cx="${xc(n-1)}" cy="${y(L.cum)}"/><text class="ann" x="${xc(n-1)-8}" y="${y(L.cum)-10}" text-anchor="end">${fmt(L.cum)}</text>`;
+  g+='<g id="cg" style="display:none"><line class="guide"/><circle class="dot" r="5"/></g>';
+  g+=`<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}"/>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Cumulative pages saved">${g}</svg>`;
+  const svg=host.querySelector('svg'),cg=svg.querySelector('#cg'),d=tip(host);
+  svg.querySelector('.hit').addEventListener('pointermove',e=>{const b=svg.getBoundingClientRect();const px=(e.clientX-b.left)*W/b.width;
+    const i=Math.max(0,Math.min(n-1,Math.floor((px-m.l)/band)));const q=I.months[i];
+    cg.style.display='';const l=cg.querySelector('line');l.setAttribute('x1',xc(i));l.setAttribute('x2',xc(i));l.setAttribute('y1',m.t);l.setAttribute('y2',H-m.b);
+    const c=cg.querySelector('circle');c.setAttribute('cx',xc(i));c.setAttribute('cy',y(q.cum));
+    const mm=metrics(q.sbw,q.sc);
+    d.innerHTML=`<b>${mname(q.r,true)}</b><div class="r"><span>${lang==='ar'?'توفير الشهر':'Saved this month'}</span><span>${fmt(q.s)}</span></div><div class="r"><span>${lang==='ar'?'تكلفة الشهر (درهم)':'Month cost (AED)'}</span><span>${fmt(mm.cost)}</span></div><div class="r"><span>${lang==='ar'?'التراكمي':'Running total'}</span><span>${fmt(q.cum)}</span></div>`;
+    placeTip(host,d,xc(i)*b.width/W,y(q.cum)*b.height/H-30)});
+  svg.querySelector('.hit').addEventListener('pointerleave',()=>{cg.style.display='none';d.hidden=true});
+}
+function initAssume(){
+  const sel=document.getElementById('a-start');
+  sel.innerHTML=rows.filter(r=>r.y>=2024).map(r=>`<option value="${r.y}-${String(r.m+1).padStart(2,'0')}">${mname(r,true)}</option>`).join('');
+  const sync=()=>{document.getElementById('a-base').value=A.base;sel.value=A.start;NUMK.forEach(k=>{const el=document.getElementById('a-'+k);el.value=A[k];el.classList.toggle('changed',A[k]!==DEF[k])})};
+  sync();
+  const save=()=>{try{localStorage.setItem('zp-assume',JSON.stringify(A))}catch(e){}};
+  document.getElementById('a-base').onchange=e=>{A.base=e.target.value;save();drawImpact()};
+  sel.onchange=e=>{A.start=e.target.value;save();drawImpact()};
+  NUMK.forEach(k=>{document.getElementById('a-'+k).addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isFinite(v)||v<0||(k==='spt'&&v===0))return;A[k]=v;e.target.classList.toggle('changed',v!==DEF[k]);save();drawImpact()})});
+  document.getElementById('aReset').onclick=()=>{A=Object.assign({},DEF);save();sync();drawImpact()};
+}
+
+function renderAll(){initAssume();drawImpact();drawStacks();drawTrend();drawMix();drawShare();drawYears();drawHeat();drawTable()}
+function setLang(l){lang=l;document.documentElement.setAttribute('data-lang',l);document.documentElement.setAttribute('lang',l);
+  document.getElementById('app').setAttribute('dir',l==='ar'?'rtl':'ltr');try{localStorage.setItem('zp-lang',l)}catch(e){}renderAll()}
+document.getElementById('langBtn').onclick=()=>setLang(lang==='ar'?'en':'ar');
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{drawImpact();drawStacks();drawTrend();drawMix();drawShare()},120)});
+setLang(lang);
+})();
+</script>
+
+</body></html>
